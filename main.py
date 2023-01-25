@@ -1,6 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+import requests
+from bs4 import BeautifulSoup
 import pandas as pd
 import os, time, datetime
 
@@ -12,7 +14,7 @@ options.add_argument('--headless')
 driver = webdriver.Chrome(options=options)
 driver.get(url)
 
-
+## 1 ##
 # next_button function
 def next_button():
     is_found = True
@@ -27,8 +29,10 @@ def next_button():
 next_button()
 
 
+## 2 ##
 # empty list to store the office names
 office_list = []
+print('Creating list of all office names...')
 
 # the list of members
 member_list = driver.find_element(By.ID, 'search_results')
@@ -39,6 +43,30 @@ for member in member_list.find_elements(By.CLASS_NAME, 'result_block'):
 
 driver.close()
 
-print(len(office_list))
+print(str(len(office_list)) + ' Offices Found' + '\n')
+
+
+## 3 ##
+# search office names in google 
+for query in office_list[:3]:
+
+    # set the number of search results
+    results = 1
+    url = (f"https://www.google.com/search?q={query}&num={results}")
+    response = requests.get(url)
+
+    # parse the response's HTML with BeautifulSoup
+    soup = BeautifulSoup(response.text, 'html.parser')
+    # the title div
+    title = soup.select_one('div.kCrYT > a')
+    text = title.text
+    link = title['href']
+
+    print(text)
+    print(link.replace('/url?q=', '').split("&sa=U")[0])
+    print('\n')
+
+
 
 ### create function to save h3_title to csv here ###
+## 4 ##    
