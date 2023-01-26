@@ -4,7 +4,7 @@ The purpose of this project is to create a list of contact email addresses of th
 
 ## Description
 
-The script first scrapes [https://all-senmonka.jp/](https://all-senmonka.jp/) for a list of all office name. Then, it will search google with the office name as the query and opens the first result page. Finally, it will search each page for email addresses and saves it as a csv file.
+The script first scrapes [https://all-senmonka.jp/](https://all-senmonka.jp/) for a list of all office names. Then, it will search google with the office name as the query and opens the first result page. Finally, it will search each page for email addresses and saves it as a csv file.
 
 ## Getting Started
 
