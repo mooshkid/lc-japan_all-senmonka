@@ -37,6 +37,5 @@ Masa Yamanaka - [yamanaka@lcom-group.jp](yamanaka@lcom-group.jp)
 
 ## License
 
-This project is licensed under the [MOOSHKID] License - see the LICENSE.md file for details
 
 ## References
