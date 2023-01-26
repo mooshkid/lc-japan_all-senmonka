@@ -54,8 +54,10 @@ print(str(len(office_list)) + ' Offices Found' + '\n')
 ## 3 ##
 # empty list to store urls
 url_list = []
+# counter
+counter = 1
 # search office names in google 
-for query in office_list[:3]:
+for query in office_list:
 
     # set the number of search results
     results = 1
@@ -70,14 +72,16 @@ for query in office_list[:3]:
     link = title['href'].replace('/url?q=', '').split("&sa=U")[0]
     url_list.append(link)
 
+    print('Starting(' + str(counter) + ')...')
     print(text)
     print(link)
-    print('\n')
+    # print('\n')
 
 
 ## 4 ##    
 # Now that we have list of urls, we start the email scraping 
-for i in url_list:
+# for i in url_list:
+    i = link
     unscraped = deque([i])
 
     scraped = set()
@@ -129,7 +133,8 @@ for i in url_list:
                     if not link in unscraped and not link in scraped:
                         unscraped.append(link)
 
+    print("---------------")
+    counter += 1
+
     df = pd.DataFrame(emails, columns=["Email"])
     df.to_csv('email.csv', mode='a', index=False, header=False)
-
-print("---------------")
