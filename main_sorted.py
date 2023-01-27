@@ -34,8 +34,7 @@ def next_button():
             is_found = False
 
 # scrape_emails function
-def scrape_emails():
-    i = link
+def scrape_emails(i):
     unscraped = deque([i])
 
     scraped = set()
@@ -95,14 +94,12 @@ def scrape_emails():
 
 
 
-
 ### Main Script ###
+
 # empty list to store urls
 url_list = []
-
 # set the number of search results
 results = 1
-    
 # counter
 counter = 0
 
@@ -131,7 +128,7 @@ print(office_count + ' Offices Found' + '\n')
 
 
 ## 3 ## - Begin searching Google
-for query in office_list:
+for query in office_list[:3]:
 
     counter += 1
 
@@ -152,8 +149,8 @@ for query in office_list:
         print('Starting(' + str(counter) + '/' + office_count + ')...')
         print(text)
         print(link)
-        # call the function 
-        scrape_emails()
+        # call the function with an argument
+        scrape_emails(link)
         
     else:
         continue
