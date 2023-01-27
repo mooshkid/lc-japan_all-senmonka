@@ -11,7 +11,7 @@ import os, time, datetime
 
 
 # webdriver 
-url = 'https://www.all-senmonka.jp/search/chiba/'
+url = 'https://www.all-senmonka.jp/search/tokyo/'
 options = Options()
 options.add_argument('--headless')
 driver = webdriver.Chrome(options=options)
@@ -55,9 +55,11 @@ print(str(len(office_list)) + ' Offices Found' + '\n')
 # empty list to store urls
 url_list = []
 # counter
-counter = 1
+counter = 0
 # search office names in google 
 for query in office_list:
+
+    counter += 1
 
     # set the number of search results
     results = 1
@@ -68,73 +70,77 @@ for query in office_list:
     soup = BeautifulSoup(response.text, 'html.parser')
     # the title div
     title = soup.select_one('div.kCrYT > a')
-    text = title.text
-    link = title['href'].replace('/url?q=', '').split("&sa=U")[0]
-    url_list.append(link)
+    
+    if title is not None:   # incase there is no search results
+        text = title.text
+        link = title['href'].replace('/url?q=', '').split("&sa=U")[0]
+        url_list.append(link)
 
-    print('Starting(' + str(counter) + ')...')
-    print(text)
-    print(link)
-    # print('\n')
+        print('Starting(' + str(counter) + ')...')
+        print(text)
+        print(link)
+        # print('\n')
 
 
-## 4 ##    
-# Now that we have list of urls, we start the email scraping 
-# for i in url_list:
-    i = link
-    unscraped = deque([i])
+    ## 4 ##    
+    # Now that we have list of urls, we start the email scraping 
+    # for i in url_list:
+        i = link
+        unscraped = deque([i])
 
-    scraped = set()
+        scraped = set()
 
-    emails = set()
+        emails = set()
 
-    while len(unscraped):
-        url = unscraped.popleft()
-        scraped.add(url)
+        while len(unscraped):
+            url = unscraped.popleft()
+            scraped.add(url)
 
-        parts = urlsplit(url)
+            parts = urlsplit(url)
 
-        base_url = "{0.scheme}://{0.netloc}".format(parts)
-        if '/' in parts.path:
-            path = url[:url.rfind('/')+1]
-        else:
-            path = url
-
-        print("Crawling URL %s" % url)
-        try:
-            response = requests.get(url, timeout=5, allow_redirects=False)
-        except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            continue
-
-        ### CHOOSE THE BEST REGEX HERE ###
-        new_emails = set(re.findall(
-            # r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", response.text, re.I))
-            # r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', response.text, re.I))
-            r'\b[A-Za-z0-9._%+-]+@[A-Za-z.-]+\.[A-Z|a-z]{2,}\b', response.text, re.I))
-        emails.update(new_emails)
-
-        print(emails)
-
-        soup = BeautifulSoup(response.text, 'lxml')
-
-        for anchor in soup.find_all("a"):
-            if "href" in anchor.attrs:
-                link = anchor.attrs["href"]
+            base_url = "{0.scheme}://{0.netloc}".format(parts)
+            if '/' in parts.path:
+                path = url[:url.rfind('/')+1]
             else:
-                link = ''
+                path = url
 
-                if link.startswith('/'):
-                    link = base_url + link
+            print("Crawling URL %s" % url)
+            try:
+                response = requests.get(url, timeout=5, allow_redirects=False)
+            except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+                continue
 
-                elif not link.startswith('http'):
-                    link = path + link
+            ### CHOOSE THE BEST REGEX HERE ###
+            new_emails = set(re.findall(
+                # r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", response.text, re.I))
+                # r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', response.text, re.I))
+                r'\b[A-Za-z0-9._%+-]+@[A-Za-z.-]+\.[A-Z|a-z]{2,}\b', response.text, re.I))
+            emails.update(new_emails)
 
-                if not link.endswith(".gz"):
-                    if not link in unscraped and not link in scraped:
-                        unscraped.append(link)
+            print(emails)
 
-    print("---------------")
-    counter += 1
+            soup = BeautifulSoup(response.text, 'lxml')
 
-    df = pd.DataFrame(emails, columns=["Email"])
-    df.to_csv('email.csv', mode='a', index=False, header=False)
+            for anchor in soup.find_all("a"):
+                if "href" in anchor.attrs:
+                    link = anchor.attrs["href"]
+                else:
+                    link = ''
+
+                    if link.startswith('/'):
+                        link = base_url + link
+
+                    elif not link.startswith('http'):
+                        link = path + link
+
+                    if not link.endswith(".gz"):
+                        if not link in unscraped and not link in scraped:
+                            unscraped.append(link)
+
+        print("---------------")
+        
+
+        df = pd.DataFrame(emails, columns=["Email"])
+        df.to_csv('email.csv', mode='a', index=False, header=False)
+    else:
+        continue
