@@ -10,8 +10,10 @@ import pandas as pd
 import os, time, datetime
 
 
+prefecture = 'chiba'
+
 # webdriver 
-url = 'https://www.all-senmonka.jp/search/tokyo/'
+url = 'https://www.all-senmonka.jp/search/{}/'.format(prefecture)
 options = Options()
 options.add_argument('--headless')
 driver = webdriver.Chrome(options=options)
@@ -43,12 +45,13 @@ print('Creating list of all office names...')
 member_list = driver.find_element(By.ID, 'search_results')
 
 for member in member_list.find_elements(By.CLASS_NAME, 'result_block'):
-    h3_title = member.find_element(By.CSS_SELECTOR, 'h3').text
-    office_list.append(h3_title)
+    office_name = member.find_element(By.CSS_SELECTOR, 'h3').text
+    office_list.append(office_name)
 
 driver.close()
 
-print(str(len(office_list)) + ' Offices Found' + '\n')
+office_count = str(len(office_list))
+print(office_count + ' Offices Found' + '\n')
 
 
 ## 3 ##
@@ -71,12 +74,12 @@ for query in office_list:
     # the title div
     title = soup.select_one('div.kCrYT > a')
     
-    if title is not None:   # incase there is no search results
+    if title is not None:   # incase there are no search results
         text = title.text
         link = title['href'].replace('/url?q=', '').split("&sa=U")[0]
         url_list.append(link)
 
-        print('Starting(' + str(counter) + ')...')
+        print('Starting(' + str(counter) + '/' + office_count + ')...')
         print(text)
         print(link)
         # print('\n')
