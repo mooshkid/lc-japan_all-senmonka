@@ -35,57 +35,22 @@ def next_button():
 
 # scrape_emails function
 def scrape_emails(i):
-    unscraped = deque([i])
+    try:
+        page = requests.get(i, timeout=5, allow_redirects=False)
+    except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError, requests.exceptions.Timeout, requests.exceptions.SSLError):
+        pass
+    
+    soup = BeautifulSoup(page.content, 'html.parser')
 
-    scraped = set()
+    emails = []
+    for link in soup.find_all('a'):
+        email = link.get('href')
+        if email:
+            match = re.search(r'[\w\.-]+@[\w\.-]+', email)
+            if match:
+                emails.append(match.group(0))
 
-    emails = set()
-
-    while len(unscraped):
-        url = unscraped.popleft()
-        scraped.add(url)
-
-        parts = urlsplit(url)
-
-        base_url = "{0.scheme}://{0.netloc}".format(parts)
-        if '/' in parts.path:
-            path = url[:url.rfind('/')+1]
-        else:
-            path = url
-
-        print("Crawling URL %s" % url)
-        try:
-            response = requests.get(url, timeout=5, allow_redirects=False)
-        except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            continue
-
-        ### CHOOSE THE BEST REGEX HERE ###
-        new_emails = set(re.findall(
-            # r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", response.text, re.I))
-            # r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', response.text, re.I))
-            r'\b[A-Za-z0-9._%+-]+@[A-Za-z.-]+\.[A-Z|a-z]{2,}\b', response.text, re.I))
-        emails.update(new_emails)
-
-        print(emails)
-
-        soup = BeautifulSoup(response.text, 'lxml')
-
-        for anchor in soup.find_all("a"):
-            if "href" in anchor.attrs:
-                link = anchor.attrs["href"]
-            else:
-                link = ''
-
-                if link.startswith('/'):
-                    link = base_url + link
-
-                elif not link.startswith('http'):
-                    link = path + link
-
-                if not link.endswith(".gz"):
-                    if not link in unscraped and not link in scraped:
-                        unscraped.append(link)
-
+    print(emails)
     print("---------------")
     
 
@@ -128,7 +93,7 @@ print(office_count + ' Offices Found' + '\n')
 
 
 ## 3 ## - Begin searching Google
-for query in office_list[:3]:
+for query in office_list:
 
     counter += 1
 
