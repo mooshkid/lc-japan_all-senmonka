@@ -36,7 +36,7 @@ def next_button():
 next_button()
 
 
-## 2 ##
+## 2 ## - Create List of All Offices  
 # empty list to store the office names
 office_list = []
 print('Creating list of all office names...')
@@ -54,11 +54,12 @@ office_count = str(len(office_list))
 print(office_count + ' Offices Found' + '\n')
 
 
-## 3 ##
+## 3 ## - Begin searching Google
 # empty list to store urls
 url_list = []
 # counter
 counter = 0
+
 # search office names in google 
 for query in office_list:
 
@@ -85,9 +86,7 @@ for query in office_list:
         # print('\n')
 
 
-    ## 4 ##    
-    # Now that we have list of urls, we start the email scraping 
-    # for i in url_list:
+    ## 4 ## - Scrape each link for emails
         i = link
         unscraped = deque([i])
 
@@ -144,6 +143,9 @@ for query in office_list:
         
 
         df = pd.DataFrame(emails, columns=["Email"])
-        df.to_csv('email.csv', mode='a', index=False, header=False)
+        df.to_csv(prefecture + '.csv', mode='a', index=False, header=False)
+        
     else:
         continue
+
+print('Done')
