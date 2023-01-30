@@ -35,15 +35,19 @@ def next_button():
 
 # scrape_emails function
 def scrape_emails(i):
-    page = None
-    while page is None:
+    retries = 3
+    retries_left = retries
+    while retries_left:
         try:
             page = requests.get(i, timeout=5, allow_redirects=False)
+            break
         except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError, requests.exceptions.Timeout, requests.exceptions.SSLError):
-            continue
+            retries_left -= 1
+            if retries_left == 0:
+                print(f"Could not retrieve the page after {retries} tries.")
+                return
 
     soup = BeautifulSoup(page.content, 'html.parser')
-
     emails = []
     for link in soup.find_all('a'):
         email = link.get('href')
@@ -53,8 +57,6 @@ def scrape_emails(i):
                 emails.append(match.group(0))
 
     print(emails)
-    print("---------------")
-    
 
     df = pd.DataFrame(emails, columns=["Email"])
     df.to_csv(prefecture + '.csv', mode='a', index=False, header=False)
@@ -118,6 +120,7 @@ for query in office_list:
         print(link)
         # call the function with an argument
         scrape_emails(link)
+        print("---------------")
         
     else:
         continue
