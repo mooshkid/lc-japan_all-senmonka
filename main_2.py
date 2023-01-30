@@ -35,11 +35,13 @@ def next_button():
 
 # scrape_emails function
 def scrape_emails(i):
-    try:
-        page = requests.get(i, timeout=5, allow_redirects=False)
-    except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError, requests.exceptions.Timeout, requests.exceptions.SSLError):
-        pass
-    
+    page = None
+    while page is None:
+        try:
+            page = requests.get(i, timeout=5, allow_redirects=False)
+        except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError, requests.exceptions.Timeout, requests.exceptions.SSLError):
+            continue
+
     soup = BeautifulSoup(page.content, 'html.parser')
 
     emails = []
