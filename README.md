@@ -17,6 +17,8 @@ Python enviroment with the following dependencies installed.
 -   Selenium
 -   ChromeDriver
 -   Pandas
+-   Requests
+-   BeautifulSoup
 
 ## Usage
 
