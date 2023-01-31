@@ -1,5 +1,5 @@
 <p align="start">
-  <a href="#"><img alt="" src="https://img.shields.io/badge/Release%20Date-Jan.%2031%2C%202023-aqua" /></a>
+  <a href="#"><img alt="" src="https://img.shields.io/badge/Release%20Date-Jan.%2031%2C%202023-blue" /></a>
   <a href=""><img alt="" src="" /></a>
   <a href=""><img alt="" src="" /></a>
 </p>
